@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type"
+        content="text/html; charset=UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+    <title>Patch Service 本地测试 - UTF8版本</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .info {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .test-info {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .mock-element {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fffbf0;
+            border: 2px dashed #ffa500;
+            border-radius: 5px;
+        }
+
+        #setting-sub-layer {
+            display: none;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔧 Patch Service 本地测试 (UTF-8)</h1>
+
+        <div class="info">
+            <h3>服务器状态</h3>
+            <p>✅ 本地服务器运行在：http://localhost:3000</p>
+            <p>📝 字符编码：UTF-8</p>
+        </div>
+
+        <div class="test-info">
+            <h3>测试密钥</h3>
+            <ul>
+                <li>YOUR-SECRET-KEY-001</li>
+                <li>YOUR-SECRET-KEY-002</li>
+            </ul>
+            <h3>测试字符</h3>
+            <p>中文：你好世界</p>
+            <p>韩文：안녕하세요 (만 20세)</p>
+            <p>日文：こんにちは</p>
+            <p>Emoji：😊🎉✅</p>
+        </div>
+
+        <button onclick="runTest()">运行测试</button>
+
+        <div class="mock-element">
+            <h3>模拟页面元素（测试用）</h3>
+            <div id="setting-sub-layer">
+                <div>
+                    <div>
+                        <div>
+                            <div class="layer-body">
+                                <div>
+                                    <dl>
+                                        <div>
+                                            <dd id="name-element">原始姓名
+                                            </dd>
+                                        </div>
+                                        <div>
+                                            <dd id="date-element">原始日期
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p>姓名: <span id="display-name">原始姓名</span></p>
+            <p>日期: <span id="display-date">原始日期</span></p>
+        </div>
+
+        <div id="result" style="margin-top: 20px;"></div>
+        <div id="debug" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // 确保页面编码正确
+        if (document.characterSet !== 'UTF-8') {
+            console.warn('页面编码不是UTF-8:', document.characterSet);
+        }
+
+        // 模拟 completion 函数 - 使用 textContent 而不是 innerHTML 避免编码问题
+        window.completion = function (message) {
+            console.log('Completion message:', message);
+            const resultDiv = document.getElementById('result');
+            const isSuccess = message.includes('✅');
+
+            // 创建新元素避免编码问题
+            resultDiv.innerHTML = '';
+            const msgDiv = document.createElement('div');
+            msgDiv.className = isSuccess ? 'success' : 'error';
+            msgDiv.textContent = message;
+            resultDiv.appendChild(msgDiv);
+
+            // 调试信息
+            const debugDiv = document.getElementById('debug');
+            debugDiv.innerHTML = '<pre>调试信息：\n' +
+                '原始消息长度: ' + message.length + '\n' +
+                '字符编码: ' + document.characterSet + '\n' +
+                '消息内容: ' + JSON.stringify(message) + '</pre>';
+
+            // 如果成功，更新显示
+            if (isSuccess) {
+                const nameEl = document.querySelector(
+                    "#setting-sub-layer > div > div > div > div.layer-body > div > dl > div:nth-child(1) > dd"
+                );
+                const dateEl = document.querySelector(
+                    "#setting-sub-layer > div > div > div > div.layer-body > div > dl > div:nth-child(2) > dd"
+                );
+                if (nameEl) document.getElementById(
+                        'display-name').textContent = nameEl
+                    .textContent;
+                if (dateEl) document.getElementById(
+                        'display-date').textContent = dateEl
+                    .textContent;
+            }
+        };
+
+        function runTest() {
+            // 显示模拟元素
+            document.getElementById('setting-sub-layer').style
+                .display = 'block';
+
+            // 运行客户端代码
+            (function () {
+                // 服务器地址
+                const serverUrl =
+                    'http://localhost:3000/api/patch';
+
+                // 主函数
+                const key = prompt('请输入密钥：',
+                    'YOUR-SECRET-KEY-001');
+                if (!key) {
+                    completion('已取消');
+                    return;
+                }
+
+                const name = prompt(
+                    '输入要显示的名字\n示例：ZH** ****AN (만 20세)',
+                    'ZH** ****AN (만 20세)');
+                if (!name) {
+                    completion('已取消');
+                    return;
+                }
+
+                const date = prompt(
+                    '输入生日/认证日期 (YYYY.MM.DD)\n示例：2025.04.06',
+                    '2025.04.06');
+                if (!date) {
+                    completion('已取消');
+                    return;
+                }
+
+                console.log('发送数据:', {
+                    key,
+                    name,
+                    date
+                });
+
+                // 发送请求
+                fetch(serverUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json; charset=utf-8',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            key: key,
+                            name: name,
+                            date: date
+                        })
+                    })
+                    .then(response => {
+                        console.log('响应头:', response.headers);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('响应数据:', data);
+                        if (data.success) {
+                            try {
+                                // 使用简单解密
+                                if (data.simpleCode) {
+                                    // Base64 解码
+                                    const decoded =
+                                        decodeURIComponent(
+                                            escape(atob(data
+                                                .simpleCode
+                                            )));
+                                    console.log('解码后:',
+                                        decoded.substring(
+                                            0, 100) +
+                                        '...');
+
+                                    // 验证并移除标记
+                                    const marker =
+                                        '///VALID_CODE///';
+                                    if (decoded.startsWith(
+                                            marker)) {
+                                        const code = decoded
+                                            .substring(marker
+                                                .length);
+                                        console.log('执行代码:',
+                                            code
+                                            .substring(0,
+                                                100) +
+                                            '...');
+                                        eval(code);
+                                    } else {
+                                        throw new Error(
+                                            'Invalid code format'
+                                        );
+                                    }
+                                } else {
+                                    completion('❌ 没有返回加密代码');
+                                }
+                            } catch (e) {
+                                completion('❌ 解密错误：' + e
+                                    .message);
+                                console.error('解密错误详情：', e);
+                            }
+                        } else {
+                            completion('❌ ' + (data.error ||
+                                '请求失败'));
+                        }
+                    })
+                    .catch(error => {
+                        completion('❌ 网络错误：' + error.message);
+                        console.error('网络错误详情：', error);
+                    });
+            })();
+        }
+    </script>
+</body>
+
+</html>
