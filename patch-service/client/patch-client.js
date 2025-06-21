@@ -1,7 +1,7 @@
 // 混淆后的客户端代码
 (function(){
   // 服务器地址 - 部署时需要修改为实际地址
-  const _0x1a2b=['aHR0cDovL2xvY2FsaG9zdDozMDAwL2FwaS9wYXRjaA=='];
+  const _0x1a2b=['aHR0cDovLzQ3LjExNi4xNjUuMjI4OjMwMDgvYXBpL3BhdGNo'];
   const _0x3c4d=atob(_0x1a2b[0]);
   
   // 解密函数
